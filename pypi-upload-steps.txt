@@ -1,0 +1,9 @@
+For pypi-test
+1. Increment version in pyrpoject.toml
+2. python3.11 -m build
+3. python3.11 -m twine upload --skip-existing -r testpypi dist/*
+
+For PyPi 
+1. Increment version in pyrpoject.toml
+2. python3.11 -m build
+3. python3.11 -m twine upload --skip-existing dist/*

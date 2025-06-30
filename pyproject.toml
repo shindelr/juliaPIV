@@ -1,6 +1,6 @@
 [project]
 name = "juliaPIV"
-version = "0.0.5"
+version = "0.0.10"
 authors = [
   { name="Robin Shindelman", email="roshindelman@gmail.com" },
 ]
@@ -17,7 +17,12 @@ license-files = ["LICEN[CS]E*"]
 dependencies = [
     "click>=8.0.0",
     "PyYAML>=6.0.2",
+    "tqdm>=4.60.0",
 ]
+
+[project.scripts]
+batcher = "juliaPIV.batcher.batcher:batcher_cli"
+pivpipe = "juliaPIV.pivpipe.pivpipe:pivpipe_main"
 
 [build-system]
 requires = ["setuptools"]

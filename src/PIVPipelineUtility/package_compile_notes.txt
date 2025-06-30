@@ -7,4 +7,10 @@ needed to spin up new Julia processes.
 */
 
 using PackageCompiler
-create_app("/home/server/pi/homes/shindelr/Nearshore-PIV/PIVPipelineUtility", "../piv_build"; precompile_execution_file="precompile.jl", force=true)
+create_app("/Users/robinshindelman/repos/juliaPIV/src/PIVPipelineUtility", "piv_build"; precompile_execution_file="precompile.jl", force=true)
+
+/*
+This is going to need to be automated so that the program can be compiled on the
+system it's intended to be used on. Will need to change how the precompile.jl script
+works too so that paths are relative.
+*/

@@ -1,4 +1,3 @@
-#!/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11
 """
 Author: Robin Shindelman
 Date: 2025-04-09

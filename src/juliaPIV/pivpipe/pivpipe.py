@@ -1,4 +1,3 @@
-#!/Library/Frameworks/Python.framework/Versions/3.11/bin/python3.11
 """
 A script to run the Julia PIV portion of the pipeline.
 """

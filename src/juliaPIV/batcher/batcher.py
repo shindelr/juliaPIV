@@ -23,7 +23,7 @@ from tqdm import tqdm
               help='Number of batches desired, use this OR -n not both')
 @click.option('-d', '--drone-sort', is_flag=True,
               help='Toggle on to accurately sort jpgs from Drone Footage')
-def cli(indir, n_files_per, out_dir, num_batches, drone_sort):
+def batcher_cli(indir, n_files_per, out_dir, num_batches, drone_sort):
     """
     A script to partition a directory of files into many directories with the OG
     files split between them. 

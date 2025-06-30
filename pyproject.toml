@@ -1,0 +1,24 @@
+[project]
+name = "juliaPIV"
+version = "0.0.1"
+authors = [
+  { name="Robin Shindelman", email="roshindelman@gmail.com" },
+]
+description = "A pipeline for running JuliaPIV based on the workflow developed at OSU CEOAS"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+dependencies = [
+    "click",
+    "pyaml",
+]
+
+[project.urls]
+Homepage = "https://github.com/shindelr/juliaPIV"
+Issues = "https://github.com/shindelr/juliaPIV/issues"

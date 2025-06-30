@@ -1,0 +1,10 @@
+/*
+The command below will only work from inside of the PIVPipelineUtility directory.
+The compiled package will end up in a dir called "piv_build", one step up from
+PIVPipelineUtility. Use the force=true arg to replace an existing piv_build directory.
+The precompile_execution_file argument is pretty important to speed up the time 
+needed to spin up new Julia processes.
+*/
+
+using PackageCompiler
+create_app("/home/server/pi/homes/shindelr/Nearshore-PIV/PIVPipelineUtility", "../piv_build"; precompile_execution_file="precompile.jl", force=true)

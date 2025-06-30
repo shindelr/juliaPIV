@@ -1,0 +1,12 @@
+# config.yaml
+N: 2
+crop_factor: "1, 2448, 1, 2048"  # Uncropped
+final_win_size: 16
+ol: 0.5
+# Absolute paths
+input: "/home/server/pi/homes/shindelr/scripts/pivpipe/settings/precompile-run/in"
+output: "/home/server/pi/homes/shindelr/scripts/pivpipe/settings/precompile-run/out"
+quiet: false
+downsample_factor: 1.0
+NPROC: 1
+save_images: false

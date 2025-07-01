@@ -208,4 +208,5 @@ __marimo__/
 
 
 .test-pypi-token
-pypi-test-upload-steps.txt
+pypi-upload-steps.txt
+where_i_left_off.txt

@@ -2,10 +2,10 @@
 using Statistics
 using FFTW            # Fast Fourier Transforms library built on C
 using Images          # Basic image processing library
-using FileIO          # I/O library
-using DelimitedFiles  # Write matrices to CSV
+# using FileIO          # I/O library
+# using DelimitedFiles  # Write matrices to CSV
 using Interpolations
-using Plots
+# using Plots
 using Luxor            # For creating inpolygon() functionality
 # include("./threaded_1stpass.jl")
 
@@ -62,23 +62,23 @@ function main(image_pair::Tuple{Matrix{T},Matrix{T}},
     # Reject data that disagree strongly with their neighbors in a local window
     u, v = globfilt(u, v)
 
-    # return ((x, y), (u, v), pass_sizes)
+    return ((x, y), (u, v), pass_sizes)
 
-    # Plotting stuff
-    u_map = heatmap(u, 
-                    title = "u [pixels/frame]", 
-                    aspect_ratio = :equal, 
-                    limits=(0, 200), 
-                    xlimits=(0, 385))
+    # # Plotting stuff
+    # u_map = heatmap(u, 
+    #                 title = "u [pixels/frame]", 
+    #                 aspect_ratio = :equal, 
+    #                 limits=(0, 200), 
+    #                 xlimits=(0, 385))
 
-    v_map = heatmap(v, 
-                    title = "v [pixels/frame]", 
-                    aspect_ratio = :equal, 
-                    ylimits=(0, 200), 
-                    xlimits=(0, 385))
-    dbl_plot = plot(u_map, v_map, layout = (2, 1))
-    dest_dir = "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing"
-    png(dbl_plot, dest_dir * "037047-037048-out.png")
+    # v_map = heatmap(v, 
+    #                 title = "v [pixels/frame]", 
+    #                 aspect_ratio = :equal, 
+    #                 ylimits=(0, 200), 
+    #                 xlimits=(0, 385))
+    # dbl_plot = plot(u_map, v_map, layout = (2, 1))
+    # dest_dir = "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing"
+    # png(dbl_plot, dest_dir * "037047-037048-out.png")
 end
 
 # PASS FUNCTIONS 
@@ -116,7 +116,7 @@ function multipassx(A::Matrix{T}, B::Matrix{T}, wins::Vector{Int32}, Dt::Int32,
 
     for i in 1:total_passes-1
         # i = 1
-        println("Pass ", i, " of ", total_passes)
+        # println("Pass ", i, " of ", total_passes)
         x, y, datax, datay = firstpass(A, B, wins[i], overlap, datax, datay)
         # @time x, y, datax, datay = threaded_firstpass(A, B, wins[i], overlap, datax, datay)
         # display(datax)
@@ -142,7 +142,7 @@ function multipassx(A::Matrix{T}, B::Matrix{T}, wins::Vector{Int32}, Dt::Int32,
         end
     end
 
-    println("Final Pass")
+    # println("Final Pass")
     x, y, u, v, SnR, Pkh = finalpass(A, B, wins[end], overlap, datax, datay, Dt)
     return x, y, u, v, SnR, Pkh
     # return 0, 0, 0, 0, 0, 0
@@ -886,7 +886,7 @@ end
     Dept. of Mathematics, Mechanics Division, University of Oslo, Norway
 """
 function globfilt(u::Matrix{Float32}, v::Matrix{Float32})
-    println("Global filter running - with limit: 3 * std [U V]")
+    # println("Global filter running - with limit: 3 * std [U V]")
     # Opportunity for perfomance improvement here.
     nan_filt_u = filter(!isnan, u)
     nan_filt_v = filter(!isnan, v)
@@ -977,8 +977,6 @@ function localfilt(x::Matrix{Float32}, y::Matrix{Float32}, u::Matrix{Float32},
 
     for ii in m-1:1:na-m+2
         for jj in m-1:1:ma-m+2
-
-            # if INx[jj, ii] != 1
             # Get a 3x3 submatrix of U2
             m_floor_two = floor(Int32, m / 2)
             tmp = U2[jj-m_floor_two:jj+m_floor_two,
@@ -991,14 +989,6 @@ function localfilt(x::Matrix{Float32}, y::Matrix{Float32}, u::Matrix{Float32},
             # usum = median_bool ? im_median_magnitude(tmp[:]) : mean(tmp[:])
             histo[jj, ii] = median_bool ? im_median_magnitude(tmp[:]) : mean(tmp[:])
             histostd[jj, ii] = im_std(tmp[:])
-
-            # else
-            #     println("made it")
-            #     usum = NaN
-            #     tmp = NaN
-            #     histostd[jj, ii] = NaN
-            # end
-            # histo[jj, ii] = usum
         end
     end
 

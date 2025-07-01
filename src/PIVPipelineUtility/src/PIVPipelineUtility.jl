@@ -324,43 +324,8 @@ function io_main(N::T, crop_factor::Tuple{T,T,T,T}, final_win_size::T,
 end
 
 """
-    parse_args()
-
-    Parse arguments from command line.
-
-    Returns:
-        - `Tuple{Int32, NTuple{4, Int32}, Int32, 
-                Float32, String, String, Int32. Float32}`: ARGS to run JuliaPIV.
-"""
-function parse_args()
-        N = parse(Int32, ARGS[1])
-    
-        # Parse and split up crop factors
-        crop_factors = split(ARGS[2], ",")
-        crop_factors = [strip(crop_factor) for crop_factor in crop_factors]
-        crop_factors = [parse.(Int32, crop_factor) for crop_factor in crop_factors]
-        @assert length(crop_factors) == 4 "There should be 4 crop factors!"
-        crop_factors = (crop_factors[1], crop_factors[2], crop_factors[3], crop_factors[4])
-
-        final_win_size = parse(Int32, ARGS[3])
-        ol = parse(Float32, ARGS[4])
-        out_dir = ARGS[5]
-        in_path = ARGS[6]
-        verbose = parse(Int32, ARGS[7])
-        downsample_factor = parse(Float32, ARGS[8])
-        save_images = parse(Bool, ARGS[9])
-        return N, crop_factors, final_win_size, ol, out_dir, in_path, verbose, downsample_factor, save_images
-end
-
-"""
-    julia_main()::Cint
-
-    Main entry point to run the PIV pipeline utility. Two optional flags
-    can be passed in from the command line. `verbose` will suppress all
-    stdout if set to 0. `multi_batch` will run multiple batches of images
-    through the PIV algorithm if set to 1. Please note, that when running
-    multiple batches, the `in_path` argument should be the directory
-    containing the batches, not the batch itself.
+    Declares a function wrapper for io_main which allows C style input. This
+    reduces overhead and should speed spin-up of the compiled Julia package.
 
     .mat files will be written
     to the argued `out_dir` directory path. These .mat files will contain
@@ -380,46 +345,64 @@ end
 
     Returns:
         - `Cint`: 0 if successful, 1 if unsuccessful.
-
 """
-function julia_main()::Cint
-    # Check on ARGS
-    if length(ARGS) == 9
-        N, crop_factors, final_win_size, ol, out_dir, in_path, verbose, downsample_factor, save_images = parse_args()
-        if verbose == 0
-            og_stdout = stdout
-            redirect_stdout(devnull)
-        end
-        # Run PIV pipeline
-        try 
-            io_main(N, crop_factors, final_win_size, ol, out_dir, in_path, downsample_factor, save_images)
-        catch e
-            error(e)
-            return 1
-        end
-    else
-        println(ARGS)
-        error("Incorrect number of arguments! Should be: N crop_factors final_win_size ol out_dir in_dir downsample_factor")
-        return 1
-    end
-    if verbose == 0
-        redirect_stdout(og_stdout)
-    end
-    return 0
-end
-
 function c_io_main(
     N::Int32, 
-    left::Int32, right:Int32, top::Int32, bottom::Int32,    # Crop factors
+    left::Int32, right::Int32, top::Int32, bottom::Int32,    # Crop factors
     final_win_size::Int32,
     ol::Float32, 
-    out_dir::String, 
-    in_path::String,
-
+    out_dir_str::Cstring, 
+    in_path_str::Cstring,
+    quiet::Cint,
+    downsample_factor::Float32,
+    save_images::Cint,
     )::Cint
 
+    # Run PIV pipeline
+    try 
+        crop_factors = (left, right, top, bottom)
+        out_dir = unsafe_string(out_dir_str)    # Cstring needs to be converted
+        in_path = unsafe_string(in_path_str)
+        save_images_bool = Bool(save_images)
 
-    return 0
+        # if quiet == 1     # Shut down stdout 
+        #     og_stdout = stdout
+        #     redirect_stdout(devnull)
+        # end
+
+        io_main(N, crop_factors, final_win_size, ol, out_dir, in_path, downsample_factor, save_images_bool)
+
+        # if quiet == 1     # Bring it back
+        #     redirect_stdout(stdout)
+        # end
+
+        return 0
+    catch e
+        @error "Error in io_main: $e"
+        return 1
+    end
+end
+
+"""
+    C pointer to be exported as the outward facing function to run io_main 
+    programmatically.
+"""
+function c_io_main_ptr()::Ptr{Cvoid}
+    return @cfunction(
+        c_io_main,
+        Cint,
+        (
+            Int32,                          # N
+            Int32, Int32, Int32, Int32,     # Crop factors
+            Int32,                          # final_win_size
+            Float32,                        #ol
+            Cstring,                        # out_dir
+            Cstring,                        # in_path
+            Cint,                           # quiet
+            Float32,                        # downsample_factor
+            Cint,                           # save_images
+        )
+    )
 end
 
 end # end module

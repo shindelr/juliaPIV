@@ -3,9 +3,9 @@ using Statistics
 using FFTW            # Fast Fourier Transforms library built on C
 using Images          # Basic image processing library
 using FileIO          # I/O library
-# using DelimitedFiles  # Write matrices to CSV
+using DelimitedFiles  # Write matrices to CSV
 using Interpolations
-# using Plots
+using Plots
 using Luxor            # For creating inpolygon() functionality
 # include("./threaded_1stpass.jl")
 
@@ -27,8 +27,8 @@ using Luxor            # For creating inpolygon() functionality
 
 """
 function main(image_pair::Tuple{Matrix{T},Matrix{T}}, 
-            final_win_size::Int32, 
-            ol::Float32) where {T}
+                final_win_size::Int32, 
+                ol::Float32) where {T}
     # Convert the images to matrices of floats
     A = convert(Matrix{Float32}, image_pair[1])
     B = convert(Matrix{Float32}, image_pair[2])
@@ -62,22 +62,23 @@ function main(image_pair::Tuple{Matrix{T},Matrix{T}},
     # Reject data that disagree strongly with their neighbors in a local window
     u, v = globfilt(u, v)
 
-    return ((x, y), (u, v), pass_sizes)
+    # return ((x, y), (u, v), pass_sizes)
 
-    # # Plotting stuff
-    # u_map = heatmap(u, 
-    #                 title = "u [pixels/frame]", 
-    #                 aspect_ratio = :equal, 
-    #                 limits=(0, 200), 
-    #                 xlimits=(0, 385))
+    # Plotting stuff
+    u_map = heatmap(u, 
+                    title = "u [pixels/frame]", 
+                    aspect_ratio = :equal, 
+                    limits=(0, 200), 
+                    xlimits=(0, 385))
 
-    # v_map = heatmap(v, 
-    #                 title = "v [pixels/frame]", 
-    #                 aspect_ratio = :equal, 
-    #                 ylimits=(0, 200), 
-    #                 xlimits=(0, 385))
-    # dbl_plot = plot(u_map, v_map, layout = (2, 1))
-    # png(dbl_plot, "../../tests/piv_testing/results_out.png")
+    v_map = heatmap(v, 
+                    title = "v [pixels/frame]", 
+                    aspect_ratio = :equal, 
+                    ylimits=(0, 200), 
+                    xlimits=(0, 385))
+    dbl_plot = plot(u_map, v_map, layout = (2, 1))
+    dest_dir = "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing"
+    png(dbl_plot, dest_dir * "037047-037048-out.png")
 end
 
 # PASS FUNCTIONS 
@@ -1203,9 +1204,12 @@ function fast_max!(max_coords::Vector{NTuple{2, Float32}}, collection::Matrix{Fl
 end
 
 function run_test_data()
-    im1::Matrix{Gray{N0f8}} = load("data/im1.jpg")
-    im2::Matrix{Gray{N0f8}} = load("data/im2.jpg")
-    crops = (24, 2425, 1, 2048)
+    fp1 = "/home/server/pi/homes/shindelr/Nearshore-PIV/juliaPIV/data/A044_C001_020824.037047.jpg"
+    fp2 = "/home/server/pi/homes/shindelr/Nearshore-PIV/juliaPIV/data/A044_C001_020824.037048.jpg"
+    im1::Matrix{Gray{N0f8}} = load(fp1)
+    im2::Matrix{Gray{N0f8}} = load(fp2)
+    # crops = (24, 2425, 1, 2048)
+    crops = (1, 3072, 1, 2048)  # 2023 jpgs were uncropped
     im1 = im1[crops[3]:crops[4], crops[1]:crops[2]]
     im2 = im2[crops[3]:crops[4], crops[1]:crops[2]]
 

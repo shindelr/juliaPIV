@@ -12,7 +12,7 @@ import click
 import re
 from tqdm import tqdm
 
-@click.command()
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.argument('indir')
 @click.option('-o', '--out-dir', type=str, default='.',
               help='Directory to output .txt files')

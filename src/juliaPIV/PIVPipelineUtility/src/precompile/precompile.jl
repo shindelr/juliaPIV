@@ -5,11 +5,8 @@ ptr = PIVPipelineUtility.c_io_main_ptr()
 @assert ptr != C_NULL "C pointer precompile failed."
 
 @info "Precompiling full functionality now..."
-
 out = joinpath(@__DIR__, "out")
 in = joinpath(@__DIR__, "in/batch/precompile.txt")      # Remember that the .jl file takes a txt file as a batch not the dir
-@info out
-@info in
 cstr_out = Base.unsafe_convert(Cstring, out)
 cstr_in = Base.unsafe_convert(Cstring, in)
 try
@@ -24,7 +21,6 @@ try
         Float32(1.0),                                       # Downsample
         Cint(0)                                             # Save Images?
     )
-    @info "PIVPipelineUtility precompile complete."
 catch e
     @error "Error in io_main: $e"
     Base.showerror(stderr, e)

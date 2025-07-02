@@ -7,11 +7,6 @@ using MAT
 using ImageTransformations
 include("./main.jl")
 
-# # Remove before compiling! -----------------------------------------------------
-# const ARGS = ["3", "1, 6144, 1, 3240", "16", "0.5", 
-#             "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing/piv_mat_out",       # Output
-#             "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing/piv_batches/batch25.txt", "1", "0.5", "false"]   # Input
-
 """
     get_raw_images(path::String)::Vector{String}
 
@@ -148,11 +143,10 @@ end
 function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String, 
                     images::Vector{String}, crop_factor::Tuple{T,T,T,T}, 
                     downsample_factor::Float32, save_images::Bool) where {T}
-
     for i in 1:2:length(images) - 1
         name = replace(basename(images[i]), ".jpg" => "")
-        img1 = Gray.(load(images[i]))
-        img2= Gray.(load(images[i+1]))
+        img1 = Gray.(load(abspath(images[i])))
+        img2 = Gray.(load(abspath(images[i+1])))
 
         # Crop/Downsample
         img1 = img1[crop_factor[3]:crop_factor[4], crop_factor[1]:crop_factor[2]]

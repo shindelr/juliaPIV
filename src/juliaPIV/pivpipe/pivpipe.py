@@ -2,6 +2,7 @@
 A script to run the Julia PIV portion of the pipeline.
 """
 
+import ctypes.util
 import os
 import subprocess
 import logging
@@ -10,6 +11,8 @@ import yaml
 import click
 from copy import deepcopy
 from pathlib import Path
+from ctypes import CDLL, c_int32, c_float, c_int, c_char_p
+from platform import system
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 
@@ -46,21 +49,60 @@ def run_pipe(args):
     """
     Run the julia binary for PIV. 
     """
-    # Will probably need to be altered in future versions?
-    exec_path = '/home/server/pi/homes/shindelr/Nearshore-PIV/piv_build/bin/PIVPipelineUtility'
-    cmmd = [
-        exec_path,
-        str(args["N"]),
-        str(args["crop_factor"]),
-        str(args["final_win_size"]),
-        str(args["ol"]),
-        args["output"],
-        args["input"],
-        str(args["quiet"]),
-        str(args["downsample_factor"]),
-        str(args["save_images"]).lower()
+    # Get the compiled PIVPiplineUtility library
+    lib = load_lib()
+    lib.c_io_main.argtypes = [
+        c_int32,                                # N
+        c_int32, c_int32, c_int32, c_int32,     # Crop factors
+        c_int32,                                # final_win_size
+        c_float,                                # ol
+        c_char_p,                               # out_dir
+        c_char_p,                               # in_path
+        c_int,                                  # quiet (0/1)
+        c_float,                                # downsample_factor
+        c_int,                                  # save_images (0/1)
     ]
-    subprocess.run(cmmd, check=True)
+
+
+    # exec_path = '/home/server/pi/homes/shindelr/Nearshore-PIV/piv_build/bin/PIVPipelineUtility'
+    # cmmd = [
+    #     exec_path,
+    #     str(args["N"]),
+    #     str(args["crop_factor"]),
+    #     str(args["final_win_size"]),
+    #     str(args["ol"]),
+    #     args["output"],
+    #     args["input"],
+    #     str(args["quiet"]),
+    #     str(args["downsample_factor"]),
+    #     str(args["save_images"]).lower()
+    # ]
+    # subprocess.run(cmmd, check=True)
+
+def load_lib():
+    """
+    Discover the user's OS and load the correct compiled Julia Library.
+    """
+    # Discover user OS
+    root = Path(__file__).resolve().parents[1]   # juliaPIV/src/juliaPIV/
+    piv_build_path = os.path.join(root, "piv_build/lib")
+    acceptable_extensions = {
+        "Darwin": ("lib" ,".dylib"),
+        "Linux": ("lib" ,".so"),
+        "Windows": ("" ,".dll"),
+    }
+    try:
+        acceptable_extensions[system()]
+    except KeyError:
+        return "This OS is not currently supported by JuliaPIV."
+
+    # Find the compiled library
+    lib_name = f"{acceptable_extensions[system()][0]}pivbuild{acceptable_extensions[system()][1]}"
+    lib_path = os.path.join(piv_build_path, lib_name)
+    if not os.path.isfile(lib_path):
+        raise FileNotFoundError(f"Couldn't find compiled PIVPipelineUtility library @ {lib_path}")
+    return ctypes.CDLL(lib_path)
+
 
 def load_config(config_path, cli_args):
     """
@@ -138,4 +180,4 @@ def pivpipe_main(**kwargs):
     logging.info("Job Completed.")
 
 if __name__ == '__main__':
-    main()
+    pivpipe_main()

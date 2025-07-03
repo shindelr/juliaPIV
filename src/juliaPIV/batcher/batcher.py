@@ -36,7 +36,6 @@ def batcher_cli(indir, n_files_per, out_dir, num_batches, drone_sort):
     else:
         generate_txt_files(abs_in, abs_out, n_files_per, num_batches, int_sort=True)
 
-
 def out_dir_setup(abs_out: str) -> None:
     """
     Ensure the out directory exists, creates it if it doesn't.
@@ -48,8 +47,6 @@ def out_dir_setup(abs_out: str) -> None:
     if len(os.listdir(abs_out)) != 0:
         print("WARNING: This directory is not empty, exiting.")
         sys.exit()
-
-
 
 def generate_txt_files(abs_in: str, abs_out: str, 
                        n_files_per: int = None,
@@ -92,7 +89,6 @@ def generate_txt_files(abs_in: str, abs_out: str,
         click.echo("No batch number or file number defined. Aborting!")
     return
 
-
 def drone_sort_key(f: str) -> int | float:
     """
     A sorting key for jpgs from ROXSI 2023. 
@@ -109,11 +105,10 @@ def drone_sort_key(f: str) -> int | float:
     match = re.search(r'\.(\d+)(?=\.jpg$)', f)
     return int(match.group(1)) if match else float('inf')
 
-
 def int_sort_key(f: str) -> int | float:
     """
     A sorting key for files beginning with a group of integers.
-    Those fiels use the convention:
+    Those fields use the convention:
         011997_1738857742093682704_252_1190.jpg
         011998_1738857742106184504_252_1190.jpg
         011999_1738857742118686304_252_1190.jpg

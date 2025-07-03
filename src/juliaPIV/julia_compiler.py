@@ -23,8 +23,12 @@ def compile_juliapiv():
         using Pkg;
         using PackageCompiler;
         Pkg.instantiate();
-        create_app("{pivpipelineutility_path}", "{os.path.join(root_dir, "piv_build")}"; precompile_execution_file="{precompile_script_path}", force=true);
+        create_library("{pivpipelineutility_path}", "src/juliaPIV/piv_build"; lib_name="pivbuild", precompile_execution_file="{precompile_script_path}", force=true);
         """
+        # isdir("src/juliaPIV/piv_build/lib/julia") || mkdir("src/juliaPIV/piv_build/lib/julia");
+        # run(`install_name_tool -add_rpath @loader_path/julia src/juliaPIV/piv_build/lib/libpivbuild.dylib`);
+        # cp(joinpath(Sys.BINDIR, "..", "lib", "libjulia.dylib"), "src/juliaPIV/piv_build/lib/julia/"; force=true);
+        # cp(joinpath(Sys.BINDIR, "..", "lib", "libjulia-internal.dylib"), "src/juliaPIV/piv_build/lib/julia/"; force=true);
     ]
     subprocess.run(cmmd)
 

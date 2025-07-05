@@ -30,3 +30,14 @@ create_library("MyLib", "MyLibCompiled";
                 precompile_execution_file="MyLib/build/generate_precompile.jl",
                 precompile_statements_file="MyLib/build/additional_precompile.jl",)
 
+
+/* 
+Once compiled, make these system wide adjustments to be able to use python cytpes.CDLL
+However, this is very finnicky and not necessary. Much better to find the appropriate
+.dylib files in piv_build and link them with CDLL.
+*/
+
+[zsh]-> find ~/.julia/juliaup -name libjulia-internal.dylib
+/Users/robinshindelman/.julia/juliaup/julia-1.11.5+0.aarch64.apple.darwin14/lib/julia/libjulia-internal.dylib
+
+[zsh]-> export DYLD_FALLBACK_LIBRARY_PATH=/Users/robinshindelman/.julia/juliaup/julia-1.11.5+0.aarch64.apple.darwin14/lib/julia/:$DYLD_FALLBACK_LIBRARY_PATH

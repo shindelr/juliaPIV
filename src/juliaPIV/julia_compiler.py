@@ -3,8 +3,14 @@ Utility to compile the PIVPipelineUtility.jl and main.jl scripts.
 """
 
 import subprocess
+from platform import system
 import os
 import pathlib
+from .utils import set_fallback_path_darwin
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
+logging.basicConfig(level=logging.ERROR, format="%(asctime)s -- %(levelname)s -- %(message)s")
 
 def compile_juliapiv():
     """
@@ -25,11 +31,19 @@ def compile_juliapiv():
         Pkg.instantiate();
         create_library("{pivpipelineutility_path}", "src/juliaPIV/piv_build"; lib_name="pivbuild", precompile_execution_file="{precompile_script_path}", force=true);
         """
-        # isdir("src/juliaPIV/piv_build/lib/julia") || mkdir("src/juliaPIV/piv_build/lib/julia");
-        # run(`install_name_tool -add_rpath @loader_path/julia src/juliaPIV/piv_build/lib/libpivbuild.dylib`);
-        # cp(joinpath(Sys.BINDIR, "..", "lib", "libjulia.dylib"), "src/juliaPIV/piv_build/lib/julia/"; force=true);
-        # cp(joinpath(Sys.BINDIR, "..", "lib", "libjulia-internal.dylib"), "src/juliaPIV/piv_build/lib/julia/"; force=true);
     ]
     subprocess.run(cmmd)
 
     print(f"Build location: {os.path.join(root_dir, 'piv_build')}")
+
+def set_dyld_fallback():
+    """
+    DEPRECATED
+    Set the DYLD fallback path. TODO: Add functionality for new OS's
+    """
+    # Set DYLD_FALLBACK_LIBRARY_PATH
+    if system() == "Darwin":
+        set_fallback_path_darwin()
+    else:
+        logging.error("OS not yet supported by juliaPIV")
+        exit(1)

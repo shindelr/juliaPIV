@@ -2,19 +2,18 @@
 A script to run the Julia PIV portion of the pipeline.
 """
 
-import ctypes.util
 import os
-import subprocess
 import logging
 from multiprocessing import Pool
 import yaml
 import click
 from copy import deepcopy
 from pathlib import Path
-from ctypes import CDLL, c_int32, c_float, c_int, c_char_p
+from ctypes import CDLL, c_int32, c_float, c_int, c_char_p, RTLD_GLOBAL
 from platform import system
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
+logging.basicConfig(level=logging.ERROR, format="%(asctime)s -- %(levelname)s -- %(message)s")
 
 def launch_batch(file, args):
     """
@@ -63,21 +62,7 @@ def run_pipe(args):
         c_int,                                  # save_images (0/1)
     ]
 
-
-    # exec_path = '/home/server/pi/homes/shindelr/Nearshore-PIV/piv_build/bin/PIVPipelineUtility'
-    # cmmd = [
-    #     exec_path,
-    #     str(args["N"]),
-    #     str(args["crop_factor"]),
-    #     str(args["final_win_size"]),
-    #     str(args["ol"]),
-    #     args["output"],
-    #     args["input"],
-    #     str(args["quiet"]),
-    #     str(args["downsample_factor"]),
-    #     str(args["save_images"]).lower()
-    # ]
-    # subprocess.run(cmmd, check=True)
+    
 
 def load_lib():
     """
@@ -96,14 +81,19 @@ def load_lib():
     except KeyError:
         return "This OS is not currently supported by JuliaPIV."
 
-    # Find the compiled library
+    # Find and return the compiled library
     lib_name = f"{acceptable_extensions[system()][0]}pivbuild{acceptable_extensions[system()][1]}"
     lib_path = os.path.join(piv_build_path, lib_name)
     if not os.path.isfile(lib_path):
         raise FileNotFoundError(f"Couldn't find compiled PIVPipelineUtility library @ {lib_path}")
-    return ctypes.CDLL(lib_path)
 
+    # Find libjulia and load
+    julia1_11_name = f"{acceptable_extensions[system()][0]}julia.1.11{acceptable_extensions[system()][1]}"
+    julia_path = os.path.join(piv_build_path, julia1_11_name)    
+    CDLL(julia_path)
 
+    return CDLL(lib_path)
+    
 def load_config(config_path, cli_args):
     """
     Load the configuration YAML file for this PIV run. 

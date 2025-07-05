@@ -2,7 +2,7 @@
 Top layer
 """
 
-from .julia_compiler import compile_juliapiv
+from .julia_compiler import compile_juliapiv, set_dyld_fallback
 from .pivpipe.pivpipe import run_pipe
 from .batcher.batcher import batcher_cli
 from .utils import batch_n_nproc_logic
@@ -29,6 +29,6 @@ def pipeline(config):
     """
     Run PIV pipeline.
     """
-    print(batch_n_nproc_logic(4, 10, 12))
-    # run_pipe('test')
+    # print(batch_n_nproc_logic(4, 10, 12))
+    run_pipe('test')
 

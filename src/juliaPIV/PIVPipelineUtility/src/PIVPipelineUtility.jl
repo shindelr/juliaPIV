@@ -340,7 +340,7 @@ end
     Returns:
         - `Cint`: 0 if successful, 1 if unsuccessful.
 """
-function c_io_main(
+Base.@ccallable function c_io_main(
     N::Int32, 
     left::Int32, right::Int32, top::Int32, bottom::Int32,    # Crop factors
     final_win_size::Int32,

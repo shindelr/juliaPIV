@@ -29,12 +29,12 @@ def compile_juliapiv():
         using Pkg;
         using PackageCompiler;
         Pkg.instantiate();
-        create_library("{pivpipelineutility_path}", "src/juliaPIV/piv_build"; lib_name="pivbuild", precompile_execution_file="{precompile_script_path}", force=true);
+        create_sysimage([:PIVPipelineUtility], sysimage_path="{os.path.join(pivpipelineutility_path, "pivbuildsysimage.so")}", precompile_execution_file="{precompile_script_path}", project="{pivpipelineutility_path}");
         """
     ]
     subprocess.run(cmmd)
 
-    print(f"Build location: {os.path.join(root_dir, 'piv_build')}")
+    print(f"Build location: {os.path.join(pivpipelineutility_path, 'pivbuildsysimage.so')}")
 
 def set_dyld_fallback():
     """

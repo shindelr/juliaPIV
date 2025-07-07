@@ -5,10 +5,10 @@ final_win_size: 16
 ol: 0.5
 
 # Absolute paths
-input: /Users/robinshindelman/repos/juliaPIV/tests/jpgs
+input: /Users/robinshindelman/repos/juliaPIV/tests/batches
 output: /Users/robinshindelman/repos/juliaPIV/tests/piv_mat_out
 
 quiet: false
 downsample_factor: 0.5
-NPROC: 1
+NPROC: 4
 save_images: false

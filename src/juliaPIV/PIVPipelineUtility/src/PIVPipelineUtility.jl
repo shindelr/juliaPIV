@@ -340,23 +340,21 @@ end
     Returns:
         - `Cint`: 0 if successful, 1 if unsuccessful.
 """
-Base.@ccallable function c_io_main(
+function io_main_wrapper(
     N::Int32, 
     left::Int32, right::Int32, top::Int32, bottom::Int32,    # Crop factors
     final_win_size::Int32,
     ol::Float32, 
-    out_dir_str::Cstring, 
-    in_path_str::Cstring,
-    quiet::Cint,
+    out_dir::String, 
+    in_path::String,
+    quiet::Int,
     downsample_factor::Float32,
-    save_images::Cint,
+    save_images::Int,
     )::Cint
 
     # Run PIV pipeline
     try 
         crop_factors = (left, right, top, bottom)
-        out_dir = unsafe_string(out_dir_str)    # Cstring needs to be converted
-        in_path = unsafe_string(in_path_str)
         save_images_bool = Bool(save_images)
         
         # if quiet == 1     # Shut down stdout 
@@ -374,28 +372,6 @@ Base.@ccallable function c_io_main(
         @error "Error in io_main: $e"
         return 1
     end
-end
-
-"""
-    C pointer to be exported as the outward facing function to run io_main 
-    programmatically.
-"""
-function c_io_main_ptr()::Ptr{Cvoid}
-    return @cfunction(
-        c_io_main,
-        Cint,
-        (
-            Int32,                          # N
-            Int32, Int32, Int32, Int32,     # Crop factors
-            Int32,                          # final_win_size
-            Float32,                        #ol
-            Cstring,                        # out_dir
-            Cstring,                        # in_path
-            Cint,                           # quiet
-            Float32,                        # downsample_factor
-            Cint,                           # save_images
-        )
-    )
 end
 
 end # end module

@@ -9,7 +9,6 @@ import yaml
 import click
 from copy import deepcopy
 from pathlib import Path
-from ctypes import CDLL, c_int32, c_float, c_int, c_char_p, RTLD_GLOBAL
 from platform import system
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
@@ -46,35 +45,38 @@ def batches(abs_batch_dir):
 
 def run_pipe(args):
     """
-    Run the julia binary for PIV. 
+    Run PIV! 
     """
     # Get the compiled PIVPiplineUtility library
-    lib = load_lib()
-    lib.c_io_main.argtypes = [
-        c_int32,                                # N
-        c_int32, c_int32, c_int32, c_int32,     # Crop factors
-        c_int32,                                # final_win_size
-        c_float,                                # ol
-        c_char_p,                               # out_dir
-        c_char_p,                               # in_path
-        c_int,                                  # quiet (0/1)
-        c_float,                                # downsample_factor
-        c_int,                                  # save_images (0/1)
-    ]
+    logging.info("Loading PIV library...")
+    os.environ["PYTHON_JULIACALL_SYSIMAGE"] = load_lib()
+    from juliacall import Main as jl, convert  # Necessary to change env var first then import juliacall
+    jl.seval("using PIVPipelineUtility")
 
+    # Deal with converting Python ints and floats over to smaller 32-bit counterparts
+    n = convert(jl.Int32, args["N"]); 
+    left = convert(jl.Int32, args["crop_factor"][0]); 
+    right = convert(jl.Int32, args["crop_factor"][1])
+    bottom = convert(jl.Int32, args["crop_factor"][2]); 
+    top = convert(jl.Int32, args["crop_factor"][3]); 
+    fws = convert(jl.Int32, args["final_win_size"])
+    ol = convert(jl.Float32, args["ol"]); 
+    dsf = convert(jl.Float32, args["downsample_factor"])
+
+    jl.PIVPipelineUtility.io_main_wrapper(n, left, right, bottom, top, fws, ol, 
+                                          args["output"], args["input"], 0, dsf, 0)
     
-
 def load_lib():
     """
-    Discover the user's OS and load the correct compiled Julia Library.
+    Discover the user's OS and load the correct compiled Julia sys image.
     """
     # Discover user OS
     root = Path(__file__).resolve().parents[1]   # juliaPIV/src/juliaPIV/
-    piv_build_path = os.path.join(root, "piv_build/lib")
+    pivpipeutil_path = os.path.join(root, "PIVPipelineUtility")
     acceptable_extensions = {
-        "Darwin": ("lib" ,".dylib"),
-        "Linux": ("lib" ,".so"),
-        "Windows": ("" ,".dll"),
+        "Darwin": ".dylib",
+        "Linux": ".so",
+        "Windows": ".dll",
     }
     try:
         acceptable_extensions[system()]
@@ -82,17 +84,12 @@ def load_lib():
         return "This OS is not currently supported by JuliaPIV."
 
     # Find and return the compiled library
-    lib_name = f"{acceptable_extensions[system()][0]}pivbuild{acceptable_extensions[system()][1]}"
-    lib_path = os.path.join(piv_build_path, lib_name)
-    if not os.path.isfile(lib_path):
-        raise FileNotFoundError(f"Couldn't find compiled PIVPipelineUtility library @ {lib_path}")
+    image_name = f"pivbuildsysimage.so" #{acceptable_extensions[system()][1]}"
+    sysimage_path = os.path.join(pivpipeutil_path, image_name)
+    if not os.path.isfile(sysimage_path):
+        raise FileNotFoundError(f"Couldn't find compiled PIVPipelineUtility sys image @ {sysimage_path}")
 
-    # Find libjulia and load
-    julia1_11_name = f"{acceptable_extensions[system()][0]}julia.1.11{acceptable_extensions[system()][1]}"
-    julia_path = os.path.join(piv_build_path, julia1_11_name)    
-    CDLL(julia_path)
-
-    return CDLL(lib_path)
+    return sysimage_path
     
 def load_config(config_path, cli_args):
     """
@@ -109,6 +106,9 @@ def load_config(config_path, cli_args):
         if cli_args.get(key) is None:
             cli_args[key] = value
     
+    # Convert string to tuple. TODO: Fix args in YAML to avoid this
+    cli_args["crop_factor"] = tuple(map(int, cli_args["crop_factor"].split(',')))
+
     return cli_args
 
 def dir_cleanup(parent_out_dir, sub_out_dirs):

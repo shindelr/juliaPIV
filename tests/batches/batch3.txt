@@ -1,0 +1,2 @@
+/Users/robinshindelman/repos/juliaPIV/tests/jpgs/A044_C001_020824.037041.jpg
+/Users/robinshindelman/repos/juliaPIV/tests/jpgs/A044_C001_020824.037042.jpg

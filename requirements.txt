@@ -1,3 +1,4 @@
 click>=8.0.0
 PyYAML>=6.0.2
 tqdm>=4.60.0
+juliacall>=0.9.25

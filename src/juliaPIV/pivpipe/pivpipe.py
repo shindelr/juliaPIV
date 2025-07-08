@@ -133,6 +133,25 @@ def dir_cleanup(parent_out_dir, sub_out_dirs):
             exception_path = os.path.join(parent_out_dir, dir)
             logging.warning(f"Skipping existing non-directory file: {exception_path}")
 
+def pivpipe_main(config: dict):
+    """
+    A repeat of pivpipe_main_cli() but adjusted to work with the juliaPIV wrapper.
+    """
+    if config['quiet']:
+        config['quiet'] = 0
+    else:
+        config['quiet'] = 1
+
+    txt_list = batches(config["input"])
+    logging.info(f"Found {len(txt_list)} .txt files\n")
+
+    with Pool(processes=config['NPROC']) as pool:
+        pool.starmap(launch_batch, [(file, config) for file in txt_list])
+
+    logging.info("Cleaning up file structure.")
+    dir_cleanup(config["output"] ,os.listdir(config["output"]))
+    logging.info("Job Completed.")
+
 
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.option('-N', type=int, help="Number of frames to average together.")
@@ -146,8 +165,8 @@ def dir_cleanup(parent_out_dir, sub_out_dirs):
 @click.option('-d', '--downsample_factor', type=int, help="Image downsampling factor.")
 @click.option('-p', '--NPROC', type=int, help='Number of processes to use. Ideally should equal the number of batches if possible.')
 @click.option('-s', '--save_images', is_flag=True, help="Save cropped and downsampled images. Note that extra I/O slows execution.")
-def pivpipe_main(**kwargs):
-    logging.info("Running PIV")
+def pivpipe_main_cli(**kwargs):
+    logging.info("Running PIV...")
     if kwargs.get("config"):
         kwargs = load_config(kwargs["config"], kwargs)
     if kwargs['quiet']:
@@ -172,5 +191,6 @@ def pivpipe_main(**kwargs):
     dir_cleanup(kwargs["output"] ,os.listdir(kwargs["output"]))
     logging.info("Job Completed.")
 
+
 if __name__ == '__main__':
-    pivpipe_main()
+    pivpipe_main_cli()

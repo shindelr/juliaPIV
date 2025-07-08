@@ -210,4 +210,4 @@ __marimo__/
 .test-pypi-token
 pypi-upload-steps.txt
 where_i_left_off.txt
-piv_build
+tests/

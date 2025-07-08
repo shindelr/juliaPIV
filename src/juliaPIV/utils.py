@@ -34,7 +34,7 @@ def batch_n_nproc_logic(n, nproc, num_images):
         num_batches = find_num_batches(nproc, num_images, n)
         if num_batches > 0:
             logging.info(f"Optimal settings: \n\n\t{end_str.format(num_batches, n, num_batches, num_images // num_batches, num_batches * (num_images // num_batches))}\n")
-            return num_batches, num_batches
+            return num_batches, num_batches,
         num_images -= 1
 
     logging.error(f"N = {n}, this may be more than the number of images!\n")

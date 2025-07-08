@@ -91,7 +91,7 @@ def load_lib():
 
     return sysimage_path
     
-def load_config(config_path, cli_args):
+def load_config(config_path, cli_args=None):
     """
     Load the configuration YAML file for this PIV run. 
     """
@@ -101,6 +101,9 @@ def load_config(config_path, cli_args):
             config = yaml.safe_load(f)
         except yaml.YAMLError as e:
             raise e
+    
+    if not cli_args:
+        cli_args = {}
     # Goes through the config file and checks if arg is already supplied via CL
     for key, value in config.items():
         if cli_args.get(key) is None:

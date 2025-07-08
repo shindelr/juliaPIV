@@ -2,11 +2,12 @@
 Top layer
 """
 
-from .julia_compiler import compile_juliapiv, set_dyld_fallback
-from .pivpipe.pivpipe import run_pipe
+from .julia_compiler import compile_juliapiv
+from .pivpipe.pivpipe import run_pipe, load_config
 from .batcher.batcher import batcher_cli
 from .utils import batch_n_nproc_logic
 import click
+import os
 
 @click.group()
 def juliaPIV():
@@ -29,6 +30,8 @@ def pipeline(config):
     """
     Run PIV pipeline.
     """
-    # print(batch_n_nproc_logic(4, 10, 12))
-    run_pipe('test')
+    settings = load_config(config)
+    num_images = len(os.listdir(settings['input']))
+    batch_n_nproc_logic(settings['N'], settings["NPROC"], num_images=13)
+    # run_pipe('test')
 

@@ -1,6 +1,6 @@
 [project]
 name = "juliaPIV"
-version = "0.0.10"
+version = "1.0.0"
 authors = [
   { name="Robin Shindelman", email="roshindelman@gmail.com" },
 ]
@@ -28,7 +28,12 @@ pivpipe = "juliaPIV.pivpipe.pivpipe:pivpipe_main_cli"
 juliaPIV = "juliaPIV.juliaPIV:juliaPIV"
 
 [tool.setuptools.package-data]
-"juliaPIV" = ["PIVPipelineUtility/**/*"]
+"juliaPIV" = [
+  "PIVPipelineUtility/**/*.jl",
+  "PIVPipelineUtility/**/*.txt",
+  "PIVPipelineUtility/**/*.jpg",
+  "PIVPipelineUtility/**/*.toml"
+  ]
 
 [build-system]
 requires = ["setuptools"]

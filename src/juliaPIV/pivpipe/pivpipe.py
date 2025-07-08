@@ -74,9 +74,8 @@ def load_lib():
     root = Path(__file__).resolve().parents[1]   # juliaPIV/src/juliaPIV/
     pivpipeutil_path = os.path.join(root, "PIVPipelineUtility")
     acceptable_extensions = {
-        "Darwin": ".dylib",
+        "Darwin": ".so",
         "Linux": ".so",
-        "Windows": ".dll",
     }
     try:
         acceptable_extensions[system()]
@@ -84,7 +83,7 @@ def load_lib():
         return "This OS is not currently supported by JuliaPIV."
 
     # Find and return the compiled library
-    image_name = f"pivbuildsysimage.so" #{acceptable_extensions[system()][1]}"
+    image_name = f"pivbuildsysimage{acceptable_extensions[system()]}"
     sysimage_path = os.path.join(pivpipeutil_path, image_name)
     if not os.path.isfile(sysimage_path):
         raise FileNotFoundError(f"Couldn't find compiled PIVPipelineUtility sys image @ {sysimage_path}")

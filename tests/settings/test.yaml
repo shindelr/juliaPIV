@@ -1,14 +1,14 @@
 # config.yaml
-N: 6
+N: 4
 crop_factor: "1, 6144, 1, 3240" # Uncropped
 final_win_size: 16
 ol: 0.5
 
 # Absolute paths
 input: /Users/robinshindelman/repos/juliaPIV/tests/jpgs
-output: /Users/robinshindelman/repos/juliaPIV/tests/piv_mat_out
+output: /Users/robinshindelman/repos/juliaPIV/tests/flight123
 
 quiet: false
 downsample_factor: 0.5
-NPROC: 2
+NPROC: 7
 save_images: false

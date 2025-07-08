@@ -5,9 +5,12 @@ Top layer
 from .julia_compiler import compile_juliapiv
 from .pivpipe.pivpipe import run_pipe, load_config
 from .batcher.batcher import batcher_cli
-from .utils import batch_n_nproc_logic
+from .utils import batch_n_nproc_logic, build_dir_structure
 import click
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 
 @click.group()
 def juliaPIV():
@@ -32,6 +35,11 @@ def pipeline(config):
     """
     settings = load_config(config)
     num_images = len(os.listdir(settings['input']))
-    batch_n_nproc_logic(settings['N'], settings["NPROC"], num_images=13)
-    # run_pipe('test')
+    batch_n_nproc_logic(settings['N'], settings["NPROC"], num_images)
+
+    logging.info("Building directory structure...")
+    build_dir_structure(settings["output"])
+
+    logging.info("Batching...")
+    
 

@@ -4,6 +4,7 @@ General utilities for the PIV pipeline.
 
 from multiprocessing import cpu_count
 import logging
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s -- %(levelname)s -- %(message)s")
@@ -32,7 +33,7 @@ def batch_n_nproc_logic(n, nproc, num_images):
     while num_images >= n: 
         num_batches = find_num_batches(nproc, num_images, n)
         if num_batches > 0:
-            logging.info(f"Optimal settings: \n\n\t{end_str.format(nproc, n, num_batches, num_images // num_batches, num_batches * (num_images // num_batches))}\n")
+            logging.info(f"Optimal settings: \n\n\t{end_str.format(num_batches, n, num_batches, num_images // num_batches, num_batches * (num_images // num_batches))}\n")
             return num_batches, num_batches
         num_images -= 1
 
@@ -48,3 +49,18 @@ def find_num_batches(nproc, num_images, n):
         if img_p_batch >= n and img_p_batch % n == 0:
             return num_batches
     return 0
+
+def build_dir_structure(parent):
+    """
+    Build the output directory structure.
+    """
+    parent = Path(parent).resolve()
+    piv_mat_out = parent / "piv_mat_out"
+    piv_batches = parent / "piv_batches"
+    
+    if not parent.is_dir():
+        parent.mkdir()
+    if not piv_mat_out.is_dir():
+        piv_mat_out.mkdir()
+    if not piv_batches.is_dir():
+        piv_batches.mkdir()

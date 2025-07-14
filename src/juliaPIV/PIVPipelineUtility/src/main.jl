@@ -2,12 +2,8 @@
 using Statistics
 using FFTW            # Fast Fourier Transforms library built on C
 using Images          # Basic image processing library
-# using FileIO          # I/O library
-# using DelimitedFiles  # Write matrices to CSV
 using Interpolations
-# using Plots
 using Luxor            # For creating inpolygon() functionality
-# include("./threaded_1stpass.jl")
 
 # MAIN
 """
@@ -63,22 +59,6 @@ function main(image_pair::Tuple{Matrix{T},Matrix{T}},
     u, v = globfilt(u, v)
 
     return ((x, y), (u, v), pass_sizes)
-
-    # # Plotting stuff
-    # u_map = heatmap(u, 
-    #                 title = "u [pixels/frame]", 
-    #                 aspect_ratio = :equal, 
-    #                 limits=(0, 200), 
-    #                 xlimits=(0, 385))
-
-    # v_map = heatmap(v, 
-    #                 title = "v [pixels/frame]", 
-    #                 aspect_ratio = :equal, 
-    #                 ylimits=(0, 200), 
-    #                 xlimits=(0, 385))
-    # dbl_plot = plot(u_map, v_map, layout = (2, 1))
-    # dest_dir = "/home/server/pi/homes/shindelr/2025-06-27-fligh1-error-testing"
-    # png(dbl_plot, dest_dir * "037047-037048-out.png")
 end
 
 # PASS FUNCTIONS 

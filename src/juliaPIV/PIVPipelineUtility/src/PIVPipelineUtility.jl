@@ -357,15 +357,7 @@ function io_main_wrapper(
         crop_factors = (left, right, top, bottom)
         save_images_bool = Bool(save_images)
         
-        # if quiet == 1     # Shut down stdout 
-        #     og_stdout = stdout
-        #     redirect_stdout(devnull)
-        # end
         io_main(N, crop_factors, final_win_size, ol, out_dir, in_path, downsample_factor, save_images_bool)
-
-        # if quiet == 1     # Bring it back
-        #     redirect_stdout(stdout)
-        # end
 
         return 0
     catch e

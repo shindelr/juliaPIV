@@ -1,0 +1,13 @@
+N: 2
+crop_factor: "24, 2425, 1, 2048"
+final_win_size: 16
+ol: 0.5
+
+# Absolute paths
+input: 
+output: 
+
+quiet: false
+downsample_factor: 0.6
+NPROC: 1
+save_images: false

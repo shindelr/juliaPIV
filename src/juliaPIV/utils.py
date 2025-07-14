@@ -5,6 +5,7 @@ General utilities for the PIV pipeline.
 from multiprocessing import cpu_count
 import logging
 from pathlib import Path
+from .pivpipe.pivpipe import pivpipe_main, load_config
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s -- %(levelname)s -- %(message)s")
@@ -64,3 +65,19 @@ def build_dir_structure(parent):
         piv_mat_out.mkdir()
     if not piv_batches.is_dir():
         piv_batches.mkdir()
+
+def precompile():
+    """
+    Run a two frame PIV process on a small precompile batch stored in PIVPipelineUtility.
+    Use this function as a way to force the Julia runtime environment to compile
+    packages on a single process before running the real pivpipe process. The 
+    julia library should be loaded already.
+    """
+    root = Path(__file__).resolve().parent
+    precompile_dir = root / "PIVPipelineUtility" / "src" / "precompile"
+    input = precompile_dir / "in" / "batch"
+    output = precompile_dir / "out"
+
+    settings = load_config(precompile_dir / "precompile.yaml")
+    settings["input"], settings["output"] = str(input), str(output)
+    pivpipe_main(settings)

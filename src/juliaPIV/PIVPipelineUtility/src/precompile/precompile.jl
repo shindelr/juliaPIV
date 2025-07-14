@@ -2,8 +2,9 @@ using PIVPipelineUtility
 
 
 @info "Precompiling full functionality now..."
-out = joinpath(@__DIR__, "out")
-in = joinpath(@__DIR__, "in/batch/precompile.txt")      # Remember that the .jl file takes a txt file as a batch not the dir
+PIVPipelineUtility_src_dir = dirname(pathof(PIVPipelineUtility))  # ~/**/.venv/lib64/python3.12/site-packages/juliaPIV/PIVPipelineUtility/src
+out = joinpath(PIVPipelineUtility_src_dir, "precompile/out")
+in = joinpath(PIVPipelineUtility_src_dir, "precompile/in/batch/precompile.txt")      # Remember that the .jl file takes a txt file as a batch not the dir
 try
     PIVPipelineUtility.io_main_wrapper(
         Int32(2),                                           # N

@@ -5,7 +5,7 @@ Top layer
 from .julia_compiler import compile_juliapiv
 from .pivpipe.pivpipe import pivpipe_main, load_config
 from .batcher.batcher import out_dir_setup, generate_txt_files
-from .utils import batch_n_nproc_logic, build_dir_structure
+from .utils import batch_n_nproc_logic, build_dir_structure, precompile
 import click
 import os
 import logging
@@ -38,6 +38,10 @@ def pipeline(config):
     settings = load_config(config)
     num_images = len(os.listdir(settings['input']))
     nproc, num_batches = batch_n_nproc_logic(settings['N'], settings["NPROC"], num_images)
+    confirm_optimization = input("Okay? [Y/n]  ") 
+    if confirm_optimization.lower() != 'y':
+        logging.info("Aborting!")
+        return
     settings['NPROC'] = nproc
 
     logging.info("Building directory structure...")
@@ -48,6 +52,10 @@ def pipeline(config):
     mat_dir = str(Path(settings["output"]).resolve() / "piv_mat_out")
     out_dir_setup(batches_dir)
     generate_txt_files(settings["input"], batches_dir, num_batches=num_batches)
+
+    logging.info("Precompiling library...")
+    precompile()
+    logging.info("Library precompile complete.")
 
     settings["input"], settings["output"] = batches_dir, mat_dir
     pivpipe_main(settings)

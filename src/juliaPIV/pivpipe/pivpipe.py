@@ -51,7 +51,7 @@ def run_pipe(args):
     logging.info("Loading PIV library...")
     os.environ["PYTHON_JULIACALL_SYSIMAGE"] = load_lib()
     from juliacall import Main as jl, convert  # Necessary to change env var first then import juliacall
-    jl.seval("using PIVPipelineUtility")
+    jl.seval("using .PIVPipelineUtility")
 
     # Deal with converting Python ints and floats over to smaller 32-bit counterparts
     n = convert(jl.Int32, args["N"]); 

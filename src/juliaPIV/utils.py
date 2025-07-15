@@ -6,6 +6,7 @@ from multiprocessing import cpu_count
 import logging
 from pathlib import Path
 from .pivpipe.pivpipe import pivpipe_main, load_config
+from time import sleep
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s -- %(levelname)s -- %(message)s")
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s -- %(levelname)s -- %(message)s")
@@ -81,3 +82,36 @@ def precompile():
     settings = load_config(precompile_dir / "precompile.yaml")
     settings["input"], settings["output"] = str(input), str(output)
     pivpipe_main(settings)
+
+def loading(load_time):
+    """
+    Print a loading bar for the specified amount of time.
+    """
+    bar = [
+        "[        ]",
+        "[=       ]",
+        "[===     ]",
+        "[====    ]",
+        "[=====   ]",
+        "[======  ]",
+        "[======= ]",
+        "[========]",
+        "[ =======]",
+        "[  ======]",
+        "[   =====]",
+        "[    ====]",
+        "[     ===]",
+        "[      ==]",
+        "[       =]",
+        "[        ]",
+        "[        ]"
+        ]
+    i = 0
+    counter = load_time
+    while True:
+        print(f"\t{bar[i % len(bar)]} -- {counter:.1f}", end='\r')
+        sleep(0.1)
+        i += 1
+        counter -= .1
+        if i == load_time * 10:
+            break

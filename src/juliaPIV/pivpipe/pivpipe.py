@@ -144,8 +144,12 @@ def pivpipe_main(config: dict):
     txt_list = batches(config["input"])
     logging.info(f"Found {len(txt_list)} .txt files\n")
 
-    with Pool(processes=config['NPROC']) as pool:
-        pool.starmap(launch_batch, [(file, config) for file in txt_list])
+    try:
+        with Pool(processes=config['NPROC']) as pool:
+            pool.starmap(launch_batch, [(file, config) for file in txt_list])
+    except KeyboardInterrupt:
+        logging.warning("Keyboard interruption caught!")
+        return
 
     logging.info("Cleaning up file structure.")
     dir_cleanup(config["output"] ,os.listdir(config["output"]))

@@ -1,6 +1,6 @@
 [project]
 name = "juliaPIV"
-version = "1.0.5"
+version = "1.0.8"
 authors = [
   { name="Robin Shindelman", email="roshindelman@gmail.com" },
 ]
@@ -32,7 +32,9 @@ juliaPIV = "juliaPIV.juliaPIV:juliaPIV"
   "PIVPipelineUtility/**/*.jl",
   "PIVPipelineUtility/**/*.txt",
   "PIVPipelineUtility/**/*.jpg",
-  "PIVPipelineUtility/**/*.toml"
+  "PIVPipelineUtility/**/*.toml",
+  "PIVPipelineUtility/**/*.yaml",
+  "PIVPipelineUtility/**/*.mat",
   ]
 
 [build-system]

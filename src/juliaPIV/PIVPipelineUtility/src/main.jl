@@ -95,12 +95,9 @@ function multipassx(A::Matrix{T}, B::Matrix{T}, wins::Vector{Int32}, Dt::Int32,
     datay = copy(datax)
 
     for i in 1:total_passes-1
-        # i = 1
         # println("Pass ", i, " of ", total_passes)
         x, y, datax, datay = firstpass(A, B, wins[i], overlap, datax, datay)
-        # @time x, y, datax, datay = threaded_firstpass(A, B, wins[i], overlap, datax, datay)
-        # display(datax)
-        
+
         datax, datay = localfilt(x, y, datax, datay, sensit)
         datax, datay = linear_naninterp(datax, datay)
 
@@ -125,7 +122,6 @@ function multipassx(A::Matrix{T}, B::Matrix{T}, wins::Vector{Int32}, Dt::Int32,
     # println("Final Pass")
     x, y, u, v, SnR, Pkh = finalpass(A, B, wins[end], overlap, datax, datay, Dt)
     return x, y, u, v, SnR, Pkh
-    # return 0, 0, 0, 0, 0, 0
 end
 
 """
@@ -229,7 +225,7 @@ function firstpass(A::Matrix{T}, B::Matrix{T}, N::Int32, overlap::Float32,
             datax[cj, ci] -= (max_x1 - M) + idx[cj, ci]
             datay[cj, ci] -= (max_y1 - M) + idy[cj, ci]
             xx[cj, ci] = ii + M / 2
-            yy[cj, ci] = ii + N / 2
+            yy[cj, ci] = jj + N / 2
             ci += 1
         end
 
@@ -430,7 +426,7 @@ function finalpass(A::Matrix{T}, B::Matrix{T}, N::Int32, ol::Float32,
                 vp[cj, ci] = (-y_0 + idy[cj, ci]) / Dt
                 Pkh[cj, ci] = R[max_y1, max_x1]
                 xp[cj, ci] = ii + (M / 2) - 1
-                yp[cj, ci] = ii + (M / 2) - 1
+                yp[cj, ci] = jj + (M / 2) - 1
 
             else
                 up[cj, ci] = NaN
@@ -438,7 +434,7 @@ function finalpass(A::Matrix{T}, B::Matrix{T}, N::Int32, ol::Float32,
                 SnR[cj, ci] = NaN
                 Pkh[cj, ci] = 0
                 xp[cj, ci] = ii + (M / 2) - 1
-                yp[cj, ci] = ii + (M / 2) - 1
+                yp[cj, ci] = jj + (M / 2) - 1
             end
             ci += 1
         end
@@ -1174,12 +1170,12 @@ function fast_max!(max_coords::Vector{NTuple{2, Float32}}, collection::Matrix{Fl
 end
 
 function run_test_data()
-    fp1 = "/home/server/pi/homes/shindelr/Nearshore-PIV/juliaPIV/data/A044_C001_020824.037047.jpg"
-    fp2 = "/home/server/pi/homes/shindelr/Nearshore-PIV/juliaPIV/data/A044_C001_020824.037048.jpg"
+    fp1 = "/Users/robinshindelman/repos/juliaPIV/src/juliaPIV/PIVPipelineUtility/src/precompile/in/data/024000_1738857892153880912_252_1190.jpg"
+    fp2 = "/Users/robinshindelman/repos/juliaPIV/src/juliaPIV/PIVPipelineUtility/src/precompile/in/data/023999_1738857892141378616_252_1190.jpg"
     im1::Matrix{Gray{N0f8}} = load(fp1)
     im2::Matrix{Gray{N0f8}} = load(fp2)
-    # crops = (24, 2425, 1, 2048)
-    crops = (1, 3072, 1, 2048)  # 2023 jpgs were uncropped
+    crops = (24, 2425, 1, 2048)
+    # crops = (1, 3072, 1, 2048)  # 2023 jpgs were uncropped
     im1 = im1[crops[3]:crops[4], crops[1]:crops[2]]
     im2 = im2[crops[3]:crops[4], crops[1]:crops[2]]
 

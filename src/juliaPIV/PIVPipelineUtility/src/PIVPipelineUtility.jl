@@ -298,7 +298,6 @@ end
 function io_main(N::T, crop_factor::Tuple{T,T,T,T}, final_win_size::T,
     ol::Float32, out_dir::String, in_path::String, downsample_factor::Float32, 
     save_images::Bool) where {T}
-
     # Image pre-processing
     images = get_raw_images(in_path, N)
     if length(images) % N != 0
@@ -351,7 +350,6 @@ function io_main_wrapper(
     downsample_factor::Float32,
     save_images::Int,
     )::Cint
-
     # Run PIV pipeline
     try 
         crop_factors = (left, right, top, bottom)

@@ -145,6 +145,8 @@ function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String,
                     downsample_factor::Float32, save_images::Bool) where {T}
     for i in 1:2:length(images) - 1
         name = replace(basename(images[i]), ".jpg" => "")
+        name2 = replace(basename(images[i+1]), ".jpg" => "")
+        names = [name, name2]
         img1 = Gray.(load(abspath(images[i])))
         img2 = Gray.(load(abspath(images[i+1])))
 
@@ -182,7 +184,7 @@ function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String,
                     "pass_sizes" => pass_sizes,
                     "overlap" => ol,
                     "method" => "multin",
-                    "fn" => name,
+                    "fn" => names,
                     "u" => Float64.(u),
                     "v" => Float64.(v),
                     "npts" => npts,
@@ -211,10 +213,12 @@ function grouped_piv_memlite(N::T, final_win_size::T, ol::Float32, out_dir::Stri
 
     for i in 1:N:length(images) - 1
         name = replace(basename(images[i]), ".jpg" => "")
-
+        
         # Load/Crop/Downsample subset size N of images
         img_subset = Vector{Matrix{Gray{N0f8}}}()
+        names_subset = Vector{String}()
         for j in 1:N
+            push!(names_subset, replace(basename(images[i + j - 1]), ".jpg" => ""))
             img = Gray.(load(images[i + j - 1]))
             img = img[crop_factor[3]:crop_factor[4], crop_factor[1]:crop_factor[2]]
             if downsample_factor < 1.0
@@ -252,16 +256,16 @@ function grouped_piv_memlite(N::T, final_win_size::T, ol::Float32, out_dir::Stri
             pass_sizes = [raw_piv_results[1][3] raw_piv_results[1][3]]  # Just a formatting thing to match OG Matlab
             npts = isnan.(u_av)
             mat_dict = Dict(
-                "x" => x,
-                "y" => y,
+                "x" => Float64.(x),
+                "y" => Float64.(y),
                 "pass_sizes" => pass_sizes,
                 "overlap" => ol,
                 "method" => "multin",
-                "fn" => name,
-                "u" => u_av,
-                "v" => v_av,
-                "ustd" => u_std,
-                "vstd" => v_std,
+                "fn" => names_subset,
+                "u" => Float64.(u_av),
+                "v" => Float64.(v_av),
+                "ustd" => Float64.(u_std),
+                "vstd" => Float64.(v_std),
                 "npts" => npts,
             )
             MAT.matwrite("$out_dir/$name.mat", mat_dict)

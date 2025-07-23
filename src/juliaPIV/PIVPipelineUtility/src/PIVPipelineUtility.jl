@@ -177,14 +177,14 @@ function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String,
                 v = raw_piv_results[2][2]
                 npts = isnan.(u)
                 mat_dict = Dict(
-                    "x" => x,
-                    "y" => y,
+                    "x" => Float64.(x),
+                    "y" => Float64.(y),
                     "pass_sizes" => pass_sizes,
                     "overlap" => ol,
                     "method" => "multin",
                     "fn" => name,
-                    "u" => u,
-                    "v" => v,
+                    "u" => Float64.(u),
+                    "v" => Float64.(v),
                     "npts" => npts,
                 )
                 MAT.matwrite("$out_dir/$name.mat", mat_dict)

@@ -47,11 +47,15 @@ function statistics_of_piv_groups_memlite(piv_results, N::Int32)
     # Unpack results
     us, vs, = Vector{Matrix{Float32}}(), Vector{Matrix{Float32}}()
     xs, ys = Vector{Matrix{Float32}}(), Vector{Matrix{Float32}}()
+    snrs = Vector{Matrix{Float32}}()
+    pkhs = Vector{Matrix{Float32}}()
     for result in piv_results
         push!(xs, result[1][1])
         push!(ys, result[1][2])
         push!(us, result[2][1])
         push!(vs, result[2][2])
+        push!(snrs, result[4])
+        push!(pkhs, result[5])
     end
     
     nans = reduce(+, [isnan.(u) for u in us])
@@ -60,8 +64,10 @@ function statistics_of_piv_groups_memlite(piv_results, N::Int32)
     v_avs = nan_mean(vs)
     v_stds = nan_std(vs)
     npts = nans
+    snr_av = nan_mean(snrs) 
+    pkh_av = nan_mean(pkhs) 
 
-    return ((xs[1], ys[1]), (u_avs, v_avs), (u_stds, v_stds), npts)
+    return ((xs[1], ys[1]), (u_avs, v_avs), (u_stds, v_stds), npts, snr_av, pkh_av)
 end
 
 """
@@ -177,6 +183,8 @@ function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String,
                 y = raw_piv_results[1][2]
                 u = raw_piv_results[2][1]
                 v = raw_piv_results[2][2]
+                snr = raw_piv_results[4]
+                pkh = raw_piv_results[5]
                 npts = isnan.(u)
                 mat_dict = Dict(
                     "x" => Float64.(x),
@@ -188,6 +196,8 @@ function paired_piv(N::T, final_win_size::T, ol::Float32, out_dir::String,
                     "u" => Float64.(u),
                     "v" => Float64.(v),
                     "npts" => npts,
+                    "snr" => snr,
+                    "pkh" => pkh
                 )
                 MAT.matwrite("$out_dir/$name.mat", mat_dict)
             end
@@ -236,11 +246,11 @@ function grouped_piv_memlite(N::T, final_win_size::T, ol::Float32, out_dir::Stri
             end
         end
         try
-            # Preallocate results from PIV: [(x, y), (u, v), pass_sizes]
+            # Preallocate results from PIV: [(x, y), (u, v), pass_sizes, SnR, Pkh]
             raw_piv_results = Vector{Tuple{
                                 Tuple{Matrix{T}, Matrix{T}}, 
                                 Tuple{Matrix{T}, Matrix{T}}, 
-                                Vector{Int32}
+                                Vector{Int32}, Matrix{Float32}, Matrix{Float32}
                                 } where {T}}()
             for i in (1:length(img_subset) - 1)
                 push!(raw_piv_results, main((img_subset[i], img_subset[i+1]), Int32(final_win_size), Float32(ol)))
@@ -249,8 +259,8 @@ function grouped_piv_memlite(N::T, final_win_size::T, ol::Float32, out_dir::Stri
             # PIV stats
             ((x, y),
             (u_av, v_av),
-            (u_std, v_std), 
-            npts) = statistics_of_piv_groups_memlite(raw_piv_results, N)
+            (u_std, v_std),
+            npts, snr_av, pkh_av) = statistics_of_piv_groups_memlite(raw_piv_results, N)
 
             println("Building .mat file --> $name")
             pass_sizes = [raw_piv_results[1][3] raw_piv_results[1][3]]  # Just a formatting thing to match OG Matlab
@@ -267,6 +277,8 @@ function grouped_piv_memlite(N::T, final_win_size::T, ol::Float32, out_dir::Stri
                 "ustd" => Float64.(u_std),
                 "vstd" => Float64.(v_std),
                 "npts" => npts,
+                "snr" => snr_av,
+                "pkh" => pkh_av
             )
             MAT.matwrite("$out_dir/$name.mat", mat_dict)
         catch e

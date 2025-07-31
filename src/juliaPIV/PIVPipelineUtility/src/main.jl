@@ -58,7 +58,7 @@ function main(image_pair::Tuple{Matrix{T},Matrix{T}},
     # Reject data that disagree strongly with their neighbors in a local window
     u, v = globfilt(u, v)
 
-    return ((x, y), (u, v), pass_sizes)
+    return ((x, y), (u, v), pass_sizes, SnR, Pkh)
 end
 
 # PASS FUNCTIONS 
